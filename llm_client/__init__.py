@@ -1,11 +1,20 @@
-from typing import Any
+from typing import Any, Union, List, Optional
+from dataclasses import dataclass
 import requests
+import numpy as np
+
+# TODO: Not used yet since we are just returning strings at the moment
+@dataclass
+class Response:
+    text: str
+    scores: Optional[np.ndarray]
+    hidden_states: Optional[np.ndarray]
 
 
 class Client:
     """A client for the LTI's LLM API."""
 
-    def __init__(self, address: str = "tir-1-7", port: int = 5000) -> None:
+    def __init__(self, address: str = "tir-1-23", port: int = 5000) -> None:
         """Initialize the client.
 
         Args:
@@ -18,28 +27,31 @@ class Client:
 
     def prompt(
         self,
-        text: str,
+        text: Union[str, List[str]],
         max_tokens: int = 64,
-        greedy: bool = False,
+        do_sample: bool = True,
         **kwargs: Any,
-    ) -> str:
+    ) -> Union[str, List[str]]:
         """Prompt the LLM currently being served with a text and return the response.
         Args:
             text: The text to prompt the LLM with.
             max_tokens: The maximum number of tokens to generate. Note
                 that this is *excluding* the prompt tokens. Defaults to 64.
-            greedy: Whether to use greedy decoding. Defaults to False.
+            do_sample: Whether to use greedy decoding. Defaults to False.
             **kwargs: Additional keyword arguments to pass to model.
                 They follow HF's generate API
         Returns:
         """
+        if isinstance(text, str):
+            return self.prompt([text], max_tokens, do_sample, **kwargs)[0]
+        
         request_body = {
-            "text": [text],
+            "text": text,
             "max_new_tokens": max_tokens,
-            "do_sample": not greedy,
+            "do_sample": do_sample,
             **kwargs,
         }
         response = requests.post(
             url=f"{self.url}/generate/", json=request_body, verify=False
         )
-        return str(response.json()["text"][0])
+        return response.json()["text"]
