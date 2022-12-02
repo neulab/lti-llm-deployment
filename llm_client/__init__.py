@@ -2,14 +2,15 @@ from typing import Any, Union, List, Optional
 from dataclasses import dataclass
 import requests
 import numpy as np
+import numpy.typing as npt
 
 
 # TODO: Not used yet since we are just returning strings at the moment
 @dataclass
 class Response:
     text: str
-    scores: Optional[np.ndarray]
-    hidden_states: Optional[np.ndarray]
+    scores: Optional[npt.NDArray]
+    hidden_states: Optional[npt.NDArray]
 
 
 class Client:
