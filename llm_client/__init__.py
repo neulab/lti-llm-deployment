@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import requests
 import numpy as np
 
+
 # TODO: Not used yet since we are just returning strings at the moment
 @dataclass
 class Response:
