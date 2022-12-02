@@ -42,4 +42,4 @@ class Client:
         response = requests.post(
             url=f"{self.url}/generate/", json=request_body, verify=False
         )
-        return str(response.json()["text"][0])
+        return response.json()["text"]
