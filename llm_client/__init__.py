@@ -45,7 +45,7 @@ class Client:
             return self.prompt([text], max_new_tokens, **kwargs)[0]
 
         # TODO: Check for max length limit to avoid OOMs
-        
+
         request_body = {
             "text": text,
             "max_new_tokens": max_new_tokens,
