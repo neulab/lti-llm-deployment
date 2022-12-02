@@ -22,7 +22,7 @@ class Client:
         max_tokens: int = 64,
         greedy: bool = False,
         **kwargs: Any,
-    ) -> List[str]:
+    ) -> Any:
         """Prompt the LLM currently being served with a text and return the response.
         Args:
             text: The text to prompt the LLM with.
