@@ -28,8 +28,7 @@ class Client:
     def prompt(
         self,
         text: Union[str, List[str]],
-        max_tokens: int = 64,
-        do_sample: bool = True,
+        max_new_tokens: int = 64,
         **kwargs: Any,
     ) -> Union[str, List[str]]:
         """Prompt the LLM currently being served with a text and return the response.
@@ -43,12 +42,13 @@ class Client:
         Returns:
         """
         if isinstance(text, str):
-            return self.prompt([text], max_tokens, do_sample, **kwargs)[0]
+            return self.prompt([text], max_new_tokens, **kwargs)[0]
+
+        # TODO: Check for max length limit to avoid OOMs
         
         request_body = {
             "text": text,
-            "max_new_tokens": max_tokens,
-            "do_sample": do_sample,
+            "max_new_tokens": max_new_tokens,
             **kwargs,
         }
         response = requests.post(
