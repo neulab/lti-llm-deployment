@@ -18,8 +18,8 @@ If you don't have access to the tir cluster, please contact your advisor and ask
 Run the following commands, where `tir-x-xx` is the current location of the `lti-llm` running process.
 
 ```python
-import lti_llm_client
+import llm_client
 
-client = lti_llm_client.Client(address="tir-x-xx")
+client = llm_client.Client(address="tir-x-xx")
 client.prompt("CMU's PhD students are")
 ```
