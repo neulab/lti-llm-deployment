@@ -31,7 +31,7 @@ class Client:
         text: Union[str, List[str]],
         max_new_tokens: int = 64,
         **kwargs: Any,
-    ) -> Union[str, List[str]]:
+    ) -> Any:
         """Prompt the LLM currently being served with a text and return the response.
         Args:
             text: The text to prompt the LLM with.
