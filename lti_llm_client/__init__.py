@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 import requests
 
 
@@ -22,7 +22,7 @@ class Client:
         max_tokens: int = 64,
         greedy: bool = False,
         **kwargs: Any,
-    ) -> str:
+    ) -> List[str]:
         """Prompt the LLM currently being served with a text and return the response.
         Args:
             text: The text to prompt the LLM with.
