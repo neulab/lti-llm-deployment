@@ -1,6 +1,7 @@
 from typing import Any, Union, List, Optional
 from dataclasses import dataclass
 import requests
+import numpy as np
 import numpy.typing as npt
 
 
@@ -8,8 +9,8 @@ import numpy.typing as npt
 @dataclass
 class Response:
     text: str
-    scores: Optional[npt.NDArray]
-    hidden_states: Optional[npt.NDArray]
+    scores: Optional[npt.NDArray[np.float16]]
+    hidden_states: Optional[npt.NDArray[np.float16]]
 
 
 class Client:
