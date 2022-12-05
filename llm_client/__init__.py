@@ -1,7 +1,6 @@
 from typing import Any, Union, List, Optional
 from dataclasses import dataclass
 import requests
-import numpy as np
 import numpy.typing as npt
 
 
