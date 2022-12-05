@@ -12,9 +12,14 @@ pip install -e .
 
 ## Example API Usage
 
-```python
-import lti_llm_client
+Currently, the client must be run from a compute node on the tir cluster.
+If you don't have access to the tir cluster, please contact your advisor and ask.
 
-client = lti_llm_client.Client()
+Run the following commands, where `tir-x-xx` is the current location of the `lti-llm` running process.
+
+```python
+import llm_client
+
+client = llm_client.Client(address="tir-x-xx")
 client.prompt("CMU's PhD students are")
 ```

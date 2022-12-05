@@ -5,16 +5,18 @@ import torch
 import torch.distributed as dist
 
 import deepspeed
-from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoConfig, AutoTokenizer
 from transformers.deepspeed import HfDeepSpeedConfig
-from utils import print_rank_n
 
-from .model import Model, get_downloaded_model_path
+from ..utils import print_rank_n
+from .model import Model, get_downloaded_model_path, get_hf_model_class, load_tokenizer
 
 
 class DSZeROModel(Model):
     def __init__(self, args: Namespace) -> None:
         print_rank_n("Loading model...")
+
+        super().__init__(args)
 
         downloaded_model_path = get_downloaded_model_path(args.model_name)
 
@@ -52,10 +54,12 @@ class DSZeROModel(Model):
         # this tells from_pretrained to instantiate directly on gpus
         dschf = HfDeepSpeedConfig(ds_config)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(downloaded_model_path)
+        self.tokenizer = load_tokenizer(downloaded_model_path)
         self.pad = self.tokenizer.pad_token_id
 
-        self.model = AutoModelForCausalLM.from_pretrained(downloaded_model_path, torch_dtype=args.dtype)
+        self.model = get_hf_model_class(args.model_class).from_pretrained(
+            downloaded_model_path, torch_dtype=args.dtype
+        )
         self.model = self.model.eval()
 
         # convert model to a fully sharded model using ZeRO
