@@ -2,7 +2,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="lti_llm_client",
+    name="llm_client",
     version="0.0.1",
     author="Patrick Fernandes",
     author_email="pfernand@cs.cmu.edu",
