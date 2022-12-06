@@ -44,7 +44,7 @@ class Client:
         Returns:
         """
         if isinstance(text, str):
-            return self.prompt([text], max_new_tokens, **kwargs)[0]
+            return self.prompt([text], max_new_tokens, **kwargs)
 
         # TODO: Check for max length limit to avoid OOMs
 
