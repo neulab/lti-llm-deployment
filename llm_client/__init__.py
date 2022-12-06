@@ -2,13 +2,15 @@ from typing import Any, Union, List, Optional
 from dataclasses import dataclass
 import requests
 import numpy as np
+import numpy.typing as npt
+
 
 # TODO: Not used yet since we are just returning strings at the moment
 @dataclass
 class Response:
     text: str
-    scores: Optional[np.ndarray]
-    hidden_states: Optional[np.ndarray]
+    scores: Optional[npt.NDArray[np.float16]]
+    hidden_states: Optional[npt.NDArray[np.float16]]
 
 
 class Client:
@@ -28,10 +30,9 @@ class Client:
     def prompt(
         self,
         text: Union[str, List[str]],
-        max_tokens: int = 64,
-        do_sample: bool = True,
+        max_new_tokens: int = 64,
         **kwargs: Any,
-    ) -> Union[str, List[str]]:
+    ) -> Any:
         """Prompt the LLM currently being served with a text and return the response.
         Args:
             text: The text to prompt the LLM with.
@@ -43,12 +44,13 @@ class Client:
         Returns:
         """
         if isinstance(text, str):
-            return self.prompt([text], max_tokens, do_sample, **kwargs)[0]
-        
+            return self.prompt([text], max_new_tokens, **kwargs)[0]
+
+        # TODO: Check for max length limit to avoid OOMs
+
         request_body = {
             "text": text,
-            "max_new_tokens": max_tokens,
-            "do_sample": do_sample,
+            "max_new_tokens": max_new_tokens,
             **kwargs,
         }
         response = requests.post(

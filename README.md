@@ -12,18 +12,21 @@ pip install -e .
 
 ## Example API Usage
 
-```python
-import lti_llm_client
+Currently, the client must be run from a compute node on the tir cluster.
+If you don't have access to the tir cluster, please contact your advisor and ask.
 
-client = lti_llm_client.Client()
+Run the following commands, where `tir-x-xx` is the current location of the `lti-llm` running process.
+
+```python
+import llm_client
+
+client = llm_client.Client(address="tir-x-xx")
 client.prompt("CMU's PhD students are")
 ```
 
 ## Available arguments
-The available arguments are basically identical to [Huggingface transformers' `model.generate`](https://huggingface.co/docs/transformers/v4.24.0/en/main_classes/text_generation#transformers.generation_utils.GenerationMixin.generate) function.
 
-The first parameter (i.e., the prompt) is called `text`.
+The first parameter, `text` corresponds the prompt that will be forced-decoded by the model.
 
-Additional arguments:
-* `max_tokens`/`max_new_tokens` (`int`, default: `64`)
-* `greedy` (`True`/`False`, default: `False`)
+The rest available arguments are basically identical to [Huggingface transformers' `model.generate`](https://huggingface.co/docs/transformers/v4.24.0/en/main_classes/text_generation#transformers.generation_utils.GenerationMixin.generate) function.
+However, not all arguments are available, and better documentation of the ones that are will provided in the future.
