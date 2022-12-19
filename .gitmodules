@@ -1,3 +1,0 @@
-[submodule "DeepSpeed-MII"]
-	path = DeepSpeed-MII
-	url = git@github.com:microsoft/DeepSpeed-MII.git
