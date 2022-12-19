@@ -12,7 +12,7 @@ import grpc
 from mii.server_client import MIIServerClient
 from transformers import AutoTokenizer
 
-from ..constants import DS_INFERENCE, DS_ZERO
+from ..constants import DS_INFERENCE, DS_ZERO, GRPC_OPTIONS
 from ..models import get_downloaded_model_path, get_model_class, load_tokenizer
 from ..utils import (
     GenerateResponse,
@@ -22,7 +22,7 @@ from ..utils import (
     get_str_dtype,
     print_rank_n,
 )
-from .grpc_utils.pb import generation_pb2, generation_pb2_grpc
+from .grpc_utils.proto import generation_pb2, generation_pb2_grpc
 
 
 class ModelDeployment(MIIServerClient):
@@ -108,7 +108,7 @@ class ModelDeployment(MIIServerClient):
     def _initialize_grpc_client(self):
         self.stubs = []
         for i in self.ports:
-            channel = grpc.aio.insecure_channel(f"localhost:{i}")
+            channel = grpc.aio.insecure_channel(f"localhost:{i}", options=GRPC_OPTIONS)
             stub = generation_pb2_grpc.GenerationServiceStub(channel)
             self.stubs.append(stub)
 
@@ -145,7 +145,10 @@ class ModelDeployment(MIIServerClient):
                 raise Exception(response.error)
             else:
                 return GenerateResponse(
-                    text=[r for r in response.texts], num_generated_tokens=[n for n in response.num_generated_tokens]
+                    text=[r for r in response.texts], 
+                    num_generated_tokens=[n for n in response.num_generated_tokens],
+                    scores_b64 = [b for b in response.scores_b64],
+                    hidden_states_b64 = [b for b in response.hidden_states_b64],
                 )
         else:
             if "request" in kwargs:
