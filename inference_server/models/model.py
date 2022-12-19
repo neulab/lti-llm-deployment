@@ -68,8 +68,6 @@ class Model:
                 return_dict_in_generate=True,
             )
 
-            #print(output)
-
             output_tokens = output.sequences
             num_generated_tokens = output.num_generated_tokens.tolist()
             scores_b64 = []
