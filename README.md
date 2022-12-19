@@ -23,3 +23,10 @@ import llm_client
 client = llm_client.Client(address="tir-x-xx")
 client.prompt("CMU's PhD students are")
 ```
+
+## Available arguments
+
+The first parameter, `text` corresponds the prompt that will be forced-decoded by the model.
+
+The rest available arguments are basically identical to [Huggingface transformers' `model.generate`](https://huggingface.co/docs/transformers/v4.24.0/en/main_classes/text_generation#transformers.generation_utils.GenerationMixin.generate) function.
+However, not all arguments are available, and better documentation of the ones that are will provided in the future.
