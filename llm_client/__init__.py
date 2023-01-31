@@ -16,7 +16,7 @@ class Response:
 class Client:
     """A client for the LTI's LLM API."""
 
-    def __init__(self, address: str = "tir-1-23", port: int = 5000) -> None:
+    def __init__(self, address: str = "tir-1-28", port: int = 5000) -> None:
         """Initialize the client.
 
         Args:
