@@ -48,6 +48,8 @@ class GenerateRequest(BaseModel):
 class GenerateResponse(BaseResponse):
     text: List[str] = None
     num_generated_tokens: List[int] = None
+    scores_b64: List[str] = None
+    hidden_states_b64: List[str] = None
     method: str = "generate"
 
 

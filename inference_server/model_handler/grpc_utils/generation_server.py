@@ -5,10 +5,10 @@ import torch
 
 import grpc
 
-# from ...constants import GRPC_MAX_MSG_SIZE
+from ...constants import GRPC_OPTIONS
 from ...models import Model
 from ...utils import create_generate_request, print_rank_n
-from .pb import generation_pb2, generation_pb2_grpc
+from .proto import generation_pb2, generation_pb2_grpc
 
 
 class GenerationServer(generation_pb2_grpc.GenerationServiceServicer):
@@ -36,7 +36,10 @@ class GenerationServer(generation_pb2_grpc.GenerationServiceServicer):
             response = generation_pb2.GenerationResponse(error=str(response))
         else:
             response = generation_pb2.GenerationResponse(
-                texts=response.text, num_generated_tokens=response.num_generated_tokens
+                texts=response.text, 
+                num_generated_tokens=response.num_generated_tokens,
+                scores_b64=response.scores_b64,
+                hidden_states_b64=response.hidden_states_b64,
             )
 
         return response
@@ -45,10 +48,7 @@ class GenerationServer(generation_pb2_grpc.GenerationServiceServicer):
 def serve(inference_pipeline, port):
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=1),
-        # options=[
-        #     ("grpc.max_send_message_length", GRPC_MAX_MSG_SIZE),
-        #     ("grpc.max_receive_message_length", GRPC_MAX_MSG_SIZE),
-        # ],
+        options=GRPC_OPTIONS,
     )
     generation_pb2_grpc.add_GenerationServiceServicer_to_server(GenerationServer(inference_pipeline), server)
     server.add_insecure_port(f"[::]:{port}")

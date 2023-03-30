@@ -2,6 +2,10 @@ import argparse
 import os
 from functools import partial
 from typing import Union
+import pickle as pkl
+import base64
+
+import numpy as np
 
 import torch
 
@@ -66,16 +70,55 @@ class Model:
 
             output_tokens = output.sequences
             num_generated_tokens = output.num_generated_tokens.tolist()
+            scores_b64 = []
+            hidden_states_b64 = []
 
             if request.remove_input_from_output:
                 # the generate method's output includes input too. Remove input if
                 # that is requested by the user
                 output_tokens = [x[-i:] if i != 0 else [] for x, i in zip(output_tokens, num_generated_tokens)]
 
+            if request.output_scores:
+                # convert timestep-wise tensors to numpy array
+                scores = [score.cpu().numpy() for score in output.scores]
+                # stack timesteps and transpose batch dimension
+                # TODO: we can reduce communication by prunning the score for padding tokens
+                # currently we are sending all scores for all tokens
+                scores = np.stack(scores, axis=1)
+                # split first dimension into seperate tensors
+                # binarize the tensors/arrays
+                scores_b64 = [
+                        base64.encodebytes(pkl.dumps(score)).decode("ascii") 
+                        for score in scores
+                ]
+
+            if request.output_hidden_states:
+                # take last timestep for each layer (since it includes all the hidden states
+                # for the previous steps)
+                layerwise_hidden_states = [
+                        layer_hidden_states.cpu().numpy() 
+                        for layer_hidden_states in output.hidden_states[-1]
+                ]
+                # reshape so as to have a tensor per batch element
+                hidden_states = []
+                for b in range(len(layerwise_hidden_states[0])):
+                    hidden_states.append([
+                            layer_hidden_states[b] for layer_hidden_states in layerwise_hidden_states
+                    ])
+
+                hidden_states_b64 = [
+                        base64.encodebytes(pkl.dumps(hidden_state)).decode("ascii")
+                        for hidden_state in hidden_states]
+
             output_text = self.tokenizer.batch_decode(output_tokens, skip_special_tokens=True)
 
-            return GenerateResponse(
-                text=output_text, num_generated_tokens=num_generated_tokens)
+            res = GenerateResponse(
+                text=output_text, 
+                num_generated_tokens=num_generated_tokens,
+                scores_b64=scores_b64,
+                hidden_states_b64=hidden_states_b64,
+            )
+            return res
         except Exception as exception:
             return exception
 

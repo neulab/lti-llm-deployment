@@ -22,5 +22,7 @@ message GenerationRequest {
 message GenerationResponse {
     repeated string texts = 1;
     repeated int32 num_generated_tokens = 2;
-    string error = 3;
+    repeated string scores_b64 = 3;
+    repeated string hidden_states_b64 = 4;
+    string error = 5;
 }
