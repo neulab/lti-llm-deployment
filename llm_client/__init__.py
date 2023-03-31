@@ -16,8 +16,10 @@ class Output:
     def __str__(self) -> str:
         return self.text
 
+
 class ServerError(Exception):
     pass
+
 
 class Client:
     """A client for the LTI's LLM API."""
@@ -68,7 +70,7 @@ class Client:
             url=f"{self.url}/generate/", json=request_body, verify=False
         ).json()
 
-        if 'error' in response:
+        if "error" in response:
             raise ServerError(
                 f"Server-side Error -- {response['error']}: {response['message']}"
             )
