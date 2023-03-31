@@ -7,15 +7,18 @@ class BaseResponse(BaseModel):
     query_id: int = None
     total_time_taken: str = None
 
-
+# TODO: These defaults need to be checked 
+# I changed the minimal number to get it to work the 
+# new version of HF, but not sure if the others 
+# dont impact the results
 class GenerateRequest(BaseModel):
     text: List[str] = None
-    min_length: int = None
-    do_sample: bool = None
-    early_stopping: bool = None
-    temperature: float = None
-    top_k: int = None
-    top_p: float = None
+    min_length: int = 0
+    do_sample: bool = True
+    early_stopping: bool = False
+    temperature: float = 1.0
+    top_k: int = 50
+    top_p: float = 1.0
     typical_p: float = None
     repetition_penalty: float = None
     bos_token_id: int = None
@@ -24,7 +27,7 @@ class GenerateRequest(BaseModel):
     length_penalty: float = None
     no_repeat_ngram_size: int = None
     encoder_no_repeat_ngram_size: int = None
-    num_return_sequences: int = None
+    num_return_sequences: int = 1
     max_time: float = None
     max_new_tokens: int = None
     decoder_start_token_id: int = None
@@ -92,7 +95,7 @@ def create_generate_request(text: List[str], generate_kwargs: dict) -> GenerateR
         text=text,
         min_length=parse_field(generate_kwargs, "min_length", int),
         do_sample=parse_field(generate_kwargs, "do_sample", bool),
-        early_stopping=parse_field(generate_kwargs, "early_stopping", bool),
+        early_stopping=parse_field(generate_kwargs, "early_stopping", bool, False),
         num_beams=parse_field(generate_kwargs, "num_beams", int),
         temperature=parse_field(generate_kwargs, "temperature", float),
         top_k=parse_field(generate_kwargs, "top_k", int),
@@ -105,7 +108,7 @@ def create_generate_request(text: List[str], generate_kwargs: dict) -> GenerateR
         length_penalty=parse_field(generate_kwargs, "length_penalty", float),
         no_repeat_ngram_size=parse_field(generate_kwargs, "no_repeat_ngram_size", int),
         encoder_no_repeat_ngram_size=parse_field(generate_kwargs, "encoder_no_repeat_ngram_size", int),
-        num_return_sequences=parse_field(generate_kwargs, "num_return_sequences", int),
+        num_return_sequences=parse_field(generate_kwargs, "num_return_sequences", int, 1),
         max_time=parse_field(generate_kwargs, "max_time", float),
         max_new_tokens=parse_field(generate_kwargs, "max_new_tokens", int),
         decoder_start_token_id=parse_field(generate_kwargs, "decoder_start_token_id", int),

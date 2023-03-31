@@ -26,43 +26,49 @@ import torch.distributed as dist
 from torch import nn
 
 import transformers
-from transformers.generation_logits_process import LogitsProcessorList
-from transformers.generation_stopping_criteria import StoppingCriteriaList, validate_stopping_criteria
-from transformers.generation_utils import (
+from transformers import LogitsProcessorList
+from transformers.generation import StoppingCriteriaList, validate_stopping_criteria
+from transformers.generation import (
     GreedySearchDecoderOnlyOutput,
-    GreedySearchOutput,
+    GreedySearchEncoderDecoderOutput,
     SampleDecoderOnlyOutput,
     SampleEncoderDecoderOutput,
-    SampleOutput,
 )
 
+from transformers.generation import GenerationMixin as BaseGenerationMixin
+
+# TODO: replace this by HF classes (too lazy to find new import) 
+GreedySearchOutput = GreedySearchDecoderOnlyOutput
+SampleOutput = Union[SampleDecoderOnlyOutput, SampleEncoderDecoderOutput]
+
 
 @dataclass
-class GreedySearchEncoderDecoderOutput(transformers.generation_utils.GreedySearchEncoderDecoderOutput):
+class GreedySearchEncoderDecoderOutput(GreedySearchEncoderDecoderOutput):
     num_generated_tokens: torch.LongTensor = None
 
 
 @dataclass
-class GreedySearchDecoderOnlyOutput(transformers.generation_utils.GreedySearchDecoderOnlyOutput):
+class GreedySearchDecoderOnlyOutput(GreedySearchDecoderOnlyOutput):
     num_generated_tokens: torch.LongTensor = None
 
 
 @dataclass
-class SampleEncoderDecoderOutput(transformers.generation_utils.SampleEncoderDecoderOutput):
+class SampleEncoderDecoderOutput(SampleEncoderDecoderOutput):
     num_generated_tokens: torch.LongTensor = None
 
 
 @dataclass
-class SampleDecoderOnlyOutput(transformers.generation_utils.SampleDecoderOnlyOutput):
+class SampleDecoderOnlyOutput(SampleDecoderOnlyOutput):
     num_generated_tokens: torch.LongTensor = None
 
 
-class GenerationMixin(transformers.generation_utils.GenerationMixin):
+class GenerationMixin(BaseGenerationMixin):
     def __init__(self, model) -> None:
         super().__init__()
         self.model = model
 
     def __getattr__(self, name):
+        # TODO: hacky stuff for prepare_inputs_for_generation
         try:
             return super().__getattr__(name)
         except AttributeError:
@@ -139,7 +145,7 @@ class GenerationMixin(transformers.generation_utils.GenerationMixin):
                     break
 
             # prepare model inputs
-            model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
+            model_inputs = self.model.prepare_inputs_for_generation(input_ids, **model_kwargs)
 
             # forward pass to get next token
             outputs = self(
@@ -298,7 +304,7 @@ class GenerationMixin(transformers.generation_utils.GenerationMixin):
                     break
 
             # prepare model inputs
-            model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
+            model_inputs = self.model.prepare_inputs_for_generation(input_ids, **model_kwargs)
 
             # forward pass to get next token
             outputs = self(
