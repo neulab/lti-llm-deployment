@@ -16,6 +16,7 @@ from transformers.utils import is_offline_mode
 
 from ..utils import GenerateRequest, GenerateResponse, GenerationMixin, TokenizeRequest, TokenizeResponse, run_rank_n
 
+
 class Model:
     def __init__(self, args: argparse.Namespace) -> None:
         self.tokenizer = None
@@ -27,7 +28,6 @@ class Model:
 
     def generate(self, request: GenerateRequest) -> Union[GenerateResponse, Exception]:
         try:
-            print(request)
             check_batch_size(len(request.text), self.max_batch_size)
 
             input_tokens = self.tokenizer(request.text, return_tensors="pt", padding=True)
