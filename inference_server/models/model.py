@@ -39,6 +39,9 @@ class Model:
                 if torch.is_tensor(input_tokens[t]):
                     input_tokens[t] = input_tokens[t].to(self.input_device)
 
+            # TODO: at some point, we will want to get rid of the custom GenerateMixin class
+            # and use the generate method from transformers directly. for that we need to be 
+            # able to get the number of generated tokens from the output of the generate
             output = GenerationMixin(self.model).generate(
                 **input_tokens,
                 min_length=request.min_length,
@@ -164,10 +167,18 @@ def get_hf_model_class(model_class: str) -> Union[AutoModelForCausalLM, AutoMode
 
 
 def load_tokenizer(model_name: str) -> AutoTokenizer:
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-    if tokenizer.pad_token_id is None:
-        tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+    # HACK: for LLaMA, we need to manually get the class
+    if "llama" in model_name:
+        from transformers import LlamaTokenizer
+        tokenizer = LlamaTokenizer.from_pretrained(model_name)
+        # HACK: while #22402 is not merged in transformers, 
+        # we need to manually add pad token. this leads to first
+        tokenizer.pad_token = "[PAD]"
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        if tokenizer.pad_token_id is None:
+            tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
     tokenizer.padding_side = "left"
+
     return tokenizer

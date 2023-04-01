@@ -17,6 +17,10 @@ class Output:
         return self.text
 
 
+class ServerError(Exception):
+    pass
+
+
 class Client:
     """A client for the LTI's LLM API."""
 
@@ -65,6 +69,11 @@ class Client:
         response: Dict[str, Any] = requests.post(
             url=f"{self.url}/generate/", json=request_body, verify=False
         ).json()
+
+        if "error" in response:
+            raise ServerError(
+                f"Server-side Error -- {response['error']}: {response['message']}"
+            )
 
         outputs = [
             Output(text=text, scores=None, hidden_states=None)
