@@ -177,4 +177,5 @@ def load_tokenizer(model_name: str) -> AutoTokenizer:
         tokenizer.pad_token_id = 2
         
     tokenizer.padding_side = "left"
+
     return tokenizer
