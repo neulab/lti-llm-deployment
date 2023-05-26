@@ -1,5 +1,5 @@
 	TOKENIZERS_PARALLELISM=false \
-	MODEL_NAME=decapoda-research/llama-30b-hf \
+	MODEL_NAME=huggyllama/llama-30b \
 	MODEL_CLASS=AutoModelForCausalLM \
 	DEPLOYMENT_FRAMEWORK=hf_accelerate \
 	DTYPE=int8 \
