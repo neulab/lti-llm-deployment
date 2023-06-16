@@ -5,7 +5,9 @@ We support HuggingFace accelerate and DeepSpeed Inference for generation.
 Install required packages:
 
 ```shell
-pip install flask flask_api gunicorn pydantic accelerate huggingface_hub>=0.9.0 deepspeed>=0.7.3 deepspeed-mii==0.0.2
+pip install flask flask_api gunicorn pydantic protobuf==3.20 \
+    transformers==4.29 huggingface_hub>=0.9.0 tokenizers>=0.13.3 accelerate \
+    deepspeed>=0.7.3 deepspeed-mii==0.0.2
 ```
 
 alternatively you can also install deepspeed from source:
@@ -35,7 +37,7 @@ Example: generate_kwargs =
 
 1. using HF accelerate
 ```shell
-python -m inference_server.cli --model_name bigscience/bloom --model_class AutoModelForCausalLM --dtype bf16 --deployment_framework hf_accelerate --generate_kwargs '{"min_length": 100, "max_new_tokens": 100, "do_sample": false}'
+python -m inference_server.benchmark --model_name bigscience/bloom-7b1 --model_class AutoModelForCausalLM --dtype bf16 --deployment_framework hf_accelerate --benchmark_cycles 5
 ```
 
 2. using DS inference
