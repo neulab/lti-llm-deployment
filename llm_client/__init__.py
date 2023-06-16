@@ -121,5 +121,3 @@ class Client:
         # }
         # return response["input_ids"], response["logits"], response["tokens"]
         return response["tokens"], response["scores"]
-        
-        # return outputs
