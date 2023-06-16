@@ -99,3 +99,29 @@ class Client:
                 output.hidden_states = hidden_state
 
         return outputs
+    
+    def score(self,text: Union[str, List[str]]):
+        request_body = {
+            "text": text,
+        }
+        
+        response = requests.post(
+            url=f"{self.url}/score/", json=request_body, verify=False
+        ).json()
+        
+        if "error" in response:
+            raise ServerError(
+                f"Server-side Error -- {response['error']}: {response['message']}"
+            )
+            
+        return response
+
+        # outputs = [
+        #     Output(text=text, scores=None, hidden_states=None)
+        #     for text in response["text"]
+        # ]
+        # outputs = {
+        #     tokens: response["tokens"]
+        #     scores: response
+        # }
+        # return response["tokens"], response["scores"]

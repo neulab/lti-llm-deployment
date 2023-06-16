@@ -4,6 +4,8 @@ from .requests import (
     GenerateResponse,
     TokenizeRequest,
     TokenizeResponse,
+    ScoreRequest,
+    ScoreResponse,
     create_generate_request,
     get_filter_dict,
     parse_bool,

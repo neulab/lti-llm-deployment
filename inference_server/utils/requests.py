@@ -54,6 +54,15 @@ class GenerateResponse(BaseResponse):
     scores_b64: List[str] = None
     hidden_states_b64: List[str] = None
     method: str = "generate"
+    
+class ScoreRequest(BaseModel):
+    text: List[str] = None
+    
+class ScoreResponse(BaseResponse):
+    # tokens: List[str] = None
+    # scores: List[float] = None
+    input_ids: List = None
+    logits: List= None
 
 
 class TokenizeRequest(BaseModel):
