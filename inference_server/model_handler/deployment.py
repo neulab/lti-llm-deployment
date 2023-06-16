@@ -178,33 +178,8 @@ class ModelDeployment(MIIServerClient):
         return response
 
     def scores(self, request: ScoreRequest) -> ScoreResponse:
-        tokenizer = self.model.tokenizer
-        tokenizer.pad_token = tokenizer.eos_token
-        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-        
-        inputs = tokenizer(request.text, padding=True, return_tensors="pt")
-        input_ids = inputs["input_ids"]
-        
-        kwargs = {
-            "pretrained_model_name_or_path": "/home/yifengw2/lti-llm/llama-7b-hf",
-            "device_map": "auto",
-            # "device_map": "balanced_low_0",
-            "load_in_8bit": True,
-        }
-        model = AutoModelForCausalLM.from_pretrained(**kwargs)
-        model.requires_grad_(False)
-        model.eval()
-        model.input_device = "cuda:0"
-        outputs = model(input_ids, labels=input_ids)
-        # print(outputs.logits)
-        return ScoreResponse(input_ids=input_ids.tolist(), logits=outputs.logits.tolist())
-        # scores = torch.log(outputs.logits.softmax(dim=-1)).detach()
-        
-        # scores = torch.gather(scores, 2, input_ids[:, :, None].cuda()).squeeze(-1)
-        # scores = scores.cpu().numpy()[0, :].tolist()
-        # tokens = [tokenizer.decode([tok]) for tok in input_ids[0]]
-        
-        # return ScoreResponse(tokens = tokens, socres = socres)
+        response = self.model.scores(request)
+        return response
 
     def _request_response(self):
         raise NotImplementedError("This method should not be implemented")

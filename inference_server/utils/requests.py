@@ -59,10 +59,10 @@ class ScoreRequest(BaseModel):
     text: List[str] = None
     
 class ScoreResponse(BaseResponse):
-    # tokens: List[str] = None
-    # scores: List[float] = None
-    input_ids: List = None
-    logits: List= None
+    # input_ids: List = None
+    # logits: List = None
+    tokens: List[str] = None
+    scores: List[float] = None
 
 
 class TokenizeRequest(BaseModel):

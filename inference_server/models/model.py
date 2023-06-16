@@ -129,6 +129,7 @@ class Model:
         response = self.tokenizer(request.text, padding=request.padding)
         return TokenizeResponse(token_ids=response.input_ids, attention_mask=response.attention_mask)
     
+    # The scores function returns the tokens and scores of a given prompt
     def scores(self, request: ScoreRequest) -> ScoreResponse:
         tokenizer = self.tokenizer
         tokenizer.pad_token = tokenizer.eos_token
@@ -138,16 +139,16 @@ class Model:
         input_ids = inputs["input_ids"]
         
         outputs = self.model(input_ids, labels = input_ids)
-
-        scores = torch.log(outputs.logits.softmax(dim=-1)).detach()
-        # scores = scores.cuda()
-        # input_ids = input_ids.cuda()
-
+        
+        logits = outputs.logits.float()
+        scores = torch.log(logits.softmax(dim=-1)).detach()
+        scores = scores.cuda()
+        input_ids = input_ids.cuda()
         scores = torch.gather(scores, 2, input_ids[:, :, None].cuda()).squeeze(-1)
         scores = scores.cpu().numpy()[0, :].tolist()
         tokens = [tokenizer.decode([tok]) for tok in input_ids[0]]
         
-        return ScoreResponse(tokens=tokens, scores=scores)
+        return ScoreResponse(tokens = tokens, scores = scores)
 
 def get_downloaded_model_path(model_name: str):
     f = partial(

@@ -97,16 +97,11 @@ def generate():
 
 @app.route("/score/", methods=["POST"])
 def score():
-    # return "haha", status.HTTP_200_OK
     try:
         x = request.get_json()
         x = ScoreRequest(**x)
 
         response, total_time_taken = run_and_log_time(partial(model.scores, request=x))
-
-        # print(response)
-        # print(total_time_taken)
-        
         response.query_id = query_ids.score_query_id
         query_ids.score_query_id += 1
         response.total_time_taken = "{:.2f} secs".format(total_time_taken)

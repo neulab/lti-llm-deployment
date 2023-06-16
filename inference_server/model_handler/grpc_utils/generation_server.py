@@ -44,38 +44,25 @@ class GenerationServer(generation_pb2_grpc.GenerationServiceServicer):
 
         return response
     
-    def Score(self, request, context):
-        text = [r for r in request.texts]
-        local_rank = int(os.getenv("LOCAL_RANK", "0"))
-        torch.cuda.set_device(local_rank)
-        self.model.input_device = local_rank
+    # def Score(self, request, context):
+    #     text = [r for r in request.texts]
+    #     local_rank = int(os.getenv("LOCAL_RANK", "0"))
+    #     torch.cuda.set_device(local_rank)
+    #     self.model.input_device = local_rank
         
-        request = ScoreRequest(text=text)
-        response = self.model.score(request)
+    #     request = ScoreRequest(text=text)
+    #     response = self.model.score(request)
  
-        if isinstance(response, Exception):
-            # if exception occurs, we don't this subprocess to crash
-            response = generation_pb2.ScoreResponse(error=str(response))
-        else:
-            response = generation_pb2.ScoreResponse(
-                tokens = response.tokens
-                scores = response.scores
-            )
+    #     if isinstance(response, Exception):
+    #         # if exception occurs, we don't this subprocess to crash
+    #         response = generation_pb2.ScoreResponse(error=str(response))
+    #     else:
+    #         response = generation_pb2.ScoreResponse(
+    #             tokens = response.tokens
+    #             scores = response.scores
+    #         )
 
-        return response       
-        
-        
-        # tokenizer = self.model.tokenizer
-        # tokenizer.pad_token = tokenizer.eos_token
-        
-        # # Tokenize the input text
-        # inputs = tokenizer(request.text, return_tensors="pt", padding=True)
-        # input_ids = inputs["input_ids"]
-        
-        # response = model(input_ids, labels = input_ids)
-        
-
-            
+    #     return response            
 
 
 def serve(inference_pipeline, port):

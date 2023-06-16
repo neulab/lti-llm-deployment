@@ -113,15 +113,13 @@ class Client:
             raise ServerError(
                 f"Server-side Error -- {response['error']}: {response['message']}"
             )
-            
-        return response
 
-        # outputs = [
-        #     Output(text=text, scores=None, hidden_states=None)
-        #     for text in response["text"]
-        # ]
         # outputs = {
+        #     input_ids: torch.tensor(response["input_ids"]),
+        #     logits: torch.tensor(response["logits"]),
         #     tokens: response["tokens"]
-        #     scores: response
         # }
-        # return response["tokens"], response["scores"]
+        # return response["input_ids"], response["logits"], response["tokens"]
+        return response["tokens"], response["scores"]
+        
+        # return outputs
