@@ -30,7 +30,11 @@ class Model:
         try:
             check_batch_size(len(request.text), self.max_batch_size)
 
-            input_tokens = self.tokenizer(request.text, return_tensors="pt", padding=True)
+            input_tokens = self.tokenizer(
+                request.text, 
+                return_tensors="pt", 
+                padding=True,
+                return_token_type_ids=False)
             max_input_length_in_batch = input_tokens.input_ids[0].shape[0]
 
             check_max_input_length(max_input_length_in_batch, self.max_input_length)
@@ -167,18 +171,11 @@ def get_hf_model_class(model_class: str) -> Union[AutoModelForCausalLM, AutoMode
 
 
 def load_tokenizer(model_name: str) -> AutoTokenizer:
-    # HACK: for LLaMA, we need to manually get the class
-    if "llama" in model_name:
-        from transformers import LlamaTokenizer
-        tokenizer = LlamaTokenizer.from_pretrained(model_name)
-        # HACK: while #22402 is not merged in transformers, 
-        # we need to manually add pad token. this leads to first
-        tokenizer.pad_token = "[PAD]"
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        if tokenizer.pad_token_id is None:
-            tokenizer.add_special_tokens({"pad_token": "[PAD]"})
-
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # TODO: llama relied on this hack, check if it is still needed
+    if "llama" in model_name.lower():
+        tokenizer.pad_token_id = 2
+        
     tokenizer.padding_side = "left"
 
     return tokenizer
