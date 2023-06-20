@@ -195,7 +195,7 @@ def load_tokenizer(model_name: str) -> AutoTokenizer:
     # TODO: llama relied on this hack, check if it is still needed
     if "llama" in model_name.lower():
         tokenizer.pad_token_id = 2
-
+        
     tokenizer.padding_side = "left"
 
     return tokenizer
