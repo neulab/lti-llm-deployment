@@ -19,6 +19,12 @@ class GenerationServiceStub(object):
                 request_serializer=generation__pb2.GenerationRequest.SerializeToString,
                 response_deserializer=generation__pb2.GenerationResponse.FromString,
                 )
+        
+        # self.Score = channel.unary_unary(
+        #          '/generation.GenerationService/Score',
+        #         request_serializer=generation__pb2.ScoreRequest.SerializeToString,
+        #         response_deserializer=generation__pb2.ScoreResponse.FromString,
+        #         )           
 
 
 class GenerationServiceServicer(object):
@@ -38,6 +44,11 @@ def add_GenerationServiceServicer_to_server(servicer, server):
                     request_deserializer=generation__pb2.GenerationRequest.FromString,
                     response_serializer=generation__pb2.GenerationResponse.SerializeToString,
             ),
+        #     'Score': grpc.unary_unary_rpc_method_handler(
+        #             servicer.Score,
+        #             request_deserializer=generation__pb2.ScoreRequest.FromString,
+        #             response_serializer=generation__pb2.ScoreResponse.SerializeToString,
+        #     ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'generation.GenerationService', rpc_method_handlers)
@@ -64,3 +75,19 @@ class GenerationService(object):
             generation__pb2.GenerationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+#     def Score(request,
+#             target,
+#             options=(),
+#             channel_credentials=None,
+#             call_credentials=None,
+#             insecure=False,
+#             compression=None,
+#             wait_for_ready=None,
+#             timeout=None,
+#             metadata=None):
+#         return grpc.experimental.unary_unary(request, target, '/generation.GenerationService/Score',
+#             generation__pb2.ScoreRequest.SerializeToString,
+#             generation__pb2.ScoreResponse.FromString,
+#             options, channel_credentials,
+#             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

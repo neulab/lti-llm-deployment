@@ -101,3 +101,25 @@ class Client:
                 output.hidden_states = hidden_state
 
         return outputs
+    
+    def score(self,text: Union[str, List[str]]):
+        request_body = {
+            "text": text,
+        }
+        
+        response = requests.post(
+            url=f"{self.url}/score/", json=request_body, verify=False
+        ).json()
+        
+        if "error" in response:
+            raise ServerError(
+                f"Server-side Error -- {response['error']}: {response['message']}"
+            )
+
+        # outputs = {
+        #     input_ids: torch.tensor(response["input_ids"]),
+        #     logits: torch.tensor(response["logits"]),
+        #     tokens: response["tokens"]
+        # }
+        # return response["input_ids"], response["logits"], response["tokens"]
+        return response["tokens"], response["scores"]

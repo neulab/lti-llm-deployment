@@ -37,7 +37,7 @@ Example: generate_kwargs =
 
 1. using HF accelerate
 ```shell
-python -m inference_server.cli --model_name bigscience/bloom --model_class AutoModelForCausalLM --dtype bf16 --deployment_framework hf_accelerate --generate_kwargs '{"min_length": 100, "max_new_tokens": 100, "do_sample": false}'
+python -m inference_server.benchmark --model_name bigscience/bloom-7b1 --model_class AutoModelForCausalLM --dtype bf16 --deployment_framework hf_accelerate --benchmark_cycles 5
 ```
 
 2. using DS inference

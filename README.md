@@ -22,7 +22,7 @@ The first parameter, `text` corresponds the prompt that will be forced-decoded b
 import llm_client
 
 client = llm_client.Client(address="tir-x-xx")
-ouputs = client.prompt("CMU's PhD students are")
+outputs = client.prompt("CMU's PhD students are")
 print(outputs[0].text)
 ```
 
@@ -34,7 +34,7 @@ It is also possible to obtain the raw logit scores / output distribution from th
 import llm_client
 
 client = llm_client.Client(address="tir-x-xx")
-outputs = client.prompt("CMU's PhD students are", output_scores=True)
+outputs = client.prompt(["CMU's PhD students are"], output_scores=True)
 print(outputs[0].scores.shape)
 ```
 
@@ -44,7 +44,7 @@ And equivalently, it is possible to obtain the raw hidden states from the model.
 import llm_client
 
 client = llm_client.Client(address="tir-x-xx")
-outputs = client.prompt("CMU's PhD students are", output_hidden_states=True)
+outputs = client.prompt(["CMU's PhD students are"], output_hidden_states=True)
 for layer in outputs[0].hidden_states:
     print(f"Layer {layer}: {layer.shape}")
 ```

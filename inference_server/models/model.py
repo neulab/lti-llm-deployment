@@ -14,7 +14,7 @@ from huggingface_hub import snapshot_download
 from transformers import AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoTokenizer
 from transformers.utils import is_offline_mode
 
-from ..utils import GenerateRequest, GenerateResponse, GenerationMixin, TokenizeRequest, TokenizeResponse, run_rank_n
+from ..utils import GenerateRequest, GenerateResponse, GenerationMixin, TokenizeRequest, TokenizeResponse, ScoreRequest, ScoreResponse, run_rank_n
 
 
 class Model:
@@ -132,7 +132,27 @@ class Model:
     def tokenize(self, request: TokenizeRequest) -> TokenizeResponse:
         response = self.tokenizer(request.text, padding=request.padding)
         return TokenizeResponse(token_ids=response.input_ids, attention_mask=response.attention_mask)
-
+    
+    # The scores function returns the tokens and scores of a given prompt
+    def scores(self, request: ScoreRequest) -> ScoreResponse:
+        tokenizer = self.tokenizer
+        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        
+        inputs = tokenizer(request.text, padding=True, return_tensors="pt")
+        input_ids = inputs["input_ids"]
+        
+        outputs = self.model(input_ids, labels = input_ids)
+        
+        logits = outputs.logits.float()
+        scores = torch.log(logits.softmax(dim=-1)).detach()
+        scores = scores.cuda()
+        input_ids = input_ids.cuda()
+        scores = torch.gather(scores, 2, input_ids[:, :, None].cuda()).squeeze(-1)
+        scores = scores.cpu().numpy()[0, :].tolist()
+        tokens = [tokenizer.decode([tok]) for tok in input_ids[0]]
+        
+        return ScoreResponse(tokens = tokens, scores = scores)
 
 def get_downloaded_model_path(model_name: str):
     f = partial(

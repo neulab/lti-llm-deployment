@@ -8,6 +8,9 @@ import subprocess
 import time
 from typing import List
 
+from transformers import AutoModelForCausalLM
+import torch
+
 import grpc
 from mii.server_client import MIIServerClient
 from transformers import AutoTokenizer
@@ -18,6 +21,8 @@ from ..utils import (
     GenerateResponse,
     TokenizeRequest,
     TokenizeResponse,
+    ScoreRequest,
+    ScoreResponse,
     create_generate_request,
     get_str_dtype,
     print_rank_n,
@@ -170,6 +175,10 @@ class ModelDeployment(MIIServerClient):
         else:
             response = self.model.tokenize(request)
 
+        return response
+
+    def scores(self, request: ScoreRequest) -> ScoreResponse:
+        response = self.model.scores(request)
         return response
 
     def _request_response(self):

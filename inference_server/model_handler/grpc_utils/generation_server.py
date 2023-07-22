@@ -7,7 +7,7 @@ import grpc
 
 from ...constants import GRPC_OPTIONS
 from ...models import Model
-from ...utils import create_generate_request, print_rank_n
+from ...utils import create_generate_request, print_rank_n, ScoreRequest
 from .proto import generation_pb2, generation_pb2_grpc
 
 
@@ -43,6 +43,26 @@ class GenerationServer(generation_pb2_grpc.GenerationServiceServicer):
             )
 
         return response
+    
+    # def Score(self, request, context):
+    #     text = [r for r in request.texts]
+    #     local_rank = int(os.getenv("LOCAL_RANK", "0"))
+    #     torch.cuda.set_device(local_rank)
+    #     self.model.input_device = local_rank
+        
+    #     request = ScoreRequest(text=text)
+    #     response = self.model.score(request)
+ 
+    #     if isinstance(response, Exception):
+    #         # if exception occurs, we don't this subprocess to crash
+    #         response = generation_pb2.ScoreResponse(error=str(response))
+    #     else:
+    #         response = generation_pb2.ScoreResponse(
+    #             tokens = response.tokens
+    #             scores = response.scores
+    #         )
+
+    #     return response            
 
 
 def serve(inference_pipeline, port):

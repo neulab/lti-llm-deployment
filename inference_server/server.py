@@ -10,6 +10,7 @@ from .model_handler.deployment import ModelDeployment
 from .utils import (
     GenerateRequest,
     TokenizeRequest,
+    ScoreRequest,
     get_exception_response,
     get_num_tokens_to_generate,
     get_torch_dtype,
@@ -21,6 +22,7 @@ from .utils import (
 class QueryID(BaseModel):
     generate_query_id: int = 0
     tokenize_query_id: int = 0
+    score_query_id: int = 0
 
 
 # placeholder class for getting args. gunicorn does not allow passing args to a
@@ -91,4 +93,22 @@ def generate():
     except Exception:
         response = get_exception_response(query_ids.generate_query_id, x.method, args.debug)
         query_ids.generate_query_id += 1
+        return response, status.HTTP_500_INTERNAL_SERVER_ERROR
+
+@app.route("/score/", methods=["POST"])
+def score():
+    try:
+        x = request.get_json()
+        x = ScoreRequest(**x)
+
+        response, total_time_taken = run_and_log_time(partial(model.scores, request=x))
+        response.query_id = query_ids.score_query_id
+        query_ids.score_query_id += 1
+        response.total_time_taken = "{:.2f} secs".format(total_time_taken)
+
+        return response.dict(), status.HTTP_200_OK
+    except Exception:
+        response = get_exception_response(query_ids.score_query_id, args.debug)
+        print(response)
+        query_ids.score_query_id += 1
         return response, status.HTTP_500_INTERNAL_SERVER_ERROR
